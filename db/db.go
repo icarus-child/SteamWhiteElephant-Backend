@@ -30,7 +30,11 @@ func InitPostgresDB() {
 
 	ctx := context.Background()
 
-	DeletePlayerTable(ctx)
+	DeletePlayersTable(ctx)
+	DeleteGiftsTable(ctx)
+	DeleteTagsTable(ctx)
 
-	CreatePlayerTable(ctx)
+	CreatePlayersTable(ctx)
+	CreateGiftsTable(ctx)
+	CreateTagsTable(ctx)
 }

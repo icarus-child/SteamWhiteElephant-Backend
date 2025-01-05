@@ -7,11 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type jsonPlayer struct {
-	Id string
-	db.Player
-}
-
 func getPlayer(ctx *gin.Context) {
 	id := ctx.Query("id")
 
@@ -20,18 +15,38 @@ func getPlayer(ctx *gin.Context) {
 		log.Println(err.Error())
 		ctx.JSON(400, gin.H{
 			"name":  nil,
+			"room":  nil,
 			"error": err.Error(),
 		})
 		return
 	}
 	ctx.JSON(200, gin.H{
 		"name":  player.Name,
+		"room":  player.RoomID,
 		"error": nil,
 	})
 }
 
+func getRoomPlayers(ctx *gin.Context) {
+	id := ctx.Query("id")
+
+	players, err := db.GetRoomPlayers(ctx, id)
+	if err != nil {
+		log.Println(err.Error())
+		ctx.JSON(400, gin.H{
+			"error":   err.Error(),
+			"players": nil,
+		})
+		return
+	}
+	ctx.JSON(200, gin.H{
+		"error":   nil,
+		"players": players,
+	})
+}
+
 func createPlayer(ctx *gin.Context) {
-	var json jsonPlayer
+	var json db.Player
 	err := ctx.BindJSON(&json)
 	if err != nil {
 		log.Println(err.Error())
@@ -44,7 +59,7 @@ func createPlayer(ctx *gin.Context) {
 	player := db.Player{
 		Name: json.Name,
 	}
-	err = db.CreatePlayer(ctx, json.Id, player)
+	err = db.CreatePlayer(ctx, json.PlayerID, json.RoomID, player)
 	if err != nil {
 		log.Println(err.Error())
 		ctx.JSON(400, gin.H{
@@ -52,7 +67,7 @@ func createPlayer(ctx *gin.Context) {
 		})
 		return
 	}
-	ctx.JSON(400, gin.H{
+	ctx.JSON(200, gin.H{
 		"error": nil,
 	})
 	return
