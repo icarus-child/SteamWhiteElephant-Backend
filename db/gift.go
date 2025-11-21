@@ -2,14 +2,8 @@ package db
 
 import (
 	"context"
+	"main/types"
 )
-
-type Gift struct {
-	GifterID string   `json:"gifter"`
-	SteamID  int      `json:"steamId"`
-	Name     string   `json:"name"`
-	Tags     []string `json:"tags"`
-}
 
 func DeleteGiftsTable(c context.Context) error {
 	_, err := dbpool.Exec(c, "DROP TABLE IF EXISTS gifts CASCADE;")
@@ -29,14 +23,14 @@ func CreateGiftsTable(c context.Context) error {
 	return nil
 }
 
-func GetRoomGifts(c context.Context, sid string) ([]Gift, error) {
-	var gifts []Gift
-	rows, err := dbpool.Query(c, "SELECT * FROM gifts WHERE pid IN (SELECT p.pid FROM players p WHERE p.sid = $1);", sid)
+func GetRoomGifts(c context.Context, roomid string) ([]types.Gift, error) {
+	var gifts []types.Gift
+	rows, err := dbpool.Query(c, "SELECT * FROM gifts WHERE pid IN (SELECT p.pid FROM players p WHERE p.roomid = $1);", roomid)
 	if err != nil {
 		return nil, err
 	}
 	for rows.Next() {
-		var gift Gift
+		var gift types.Gift
 		err := rows.Scan(&gift.GifterID, &gift.SteamID, &gift.Name)
 		if err != nil {
 			return nil, err
@@ -50,7 +44,7 @@ func GetRoomGifts(c context.Context, sid string) ([]Gift, error) {
 	return gifts, nil
 }
 
-func CreateGift(c context.Context, gift Gift) error {
+func CreateGift(c context.Context, gift types.Gift) error {
 	_, err := dbpool.Exec(c, "INSERT INTO gifts VALUES ($1, $2, $3);", gift.GifterID, gift.SteamID, gift.Name)
 	if err != nil {
 		println("hit1")

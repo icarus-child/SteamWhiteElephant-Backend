@@ -3,6 +3,8 @@ package db
 import (
 	"context"
 	"fmt"
+	"main/types"
+	"main/utility"
 	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -37,4 +39,35 @@ func InitPostgresDB() {
 	CreatePlayersTable(ctx)
 	CreateGiftsTable(ctx)
 	CreateTagsTable(ctx)
+}
+
+type Room struct {
+	Id       string              `json:"id"`
+	Players  []Player            `json:"players"`
+	Presents []types.PresentJson `json:"presents"`
+}
+
+func GetAll(ctx context.Context) (ret []Room, err error) {
+	rooms, err := dbpool.Query(ctx, "SELECT DISTINCT roomid FROM players;")
+	if err != nil {
+		return nil, err
+	}
+	for rooms.Next() {
+		var room Room
+		err := rooms.Scan(&room.Id)
+		if err != nil {
+			return nil, err
+		}
+		room.Players, err = GetRoomPlayers(ctx, room.Id)
+		if err != nil {
+			return nil, err
+		}
+		tempPresents, err := GetRoomGifts(ctx, room.Id)
+		if err != nil {
+			return nil, err
+		}
+		room.Presents = utility.CollectPresentsByGifter(tempPresents)
+		ret = append(ret, room)
+	}
+	return
 }

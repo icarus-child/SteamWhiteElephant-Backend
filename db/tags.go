@@ -1,6 +1,9 @@
 package db
 
-import "context"
+import (
+	"context"
+	"main/types"
+)
 
 func DeleteTagsTable(c context.Context) error {
 	_, err := dbpool.Exec(c, "DROP TABLE IF EXISTS tags CASCADE;")
@@ -37,7 +40,7 @@ func GetGiftTags(c context.Context, pid string, steamid int) ([]string, error) {
 	return tags, nil
 }
 
-func CreateTags(c context.Context, gift Gift) error {
+func CreateTags(c context.Context, gift types.Gift) error {
 	for _, tag := range gift.Tags {
 		_, err := dbpool.Exec(c, "INSERT INTO tags VALUES ($1, $2, $3);", gift.GifterID, gift.SteamID, tag)
 		if err != nil {
