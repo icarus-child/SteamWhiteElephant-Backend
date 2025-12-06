@@ -2,6 +2,7 @@ package router
 
 import (
 	"log"
+
 	"main/db"
 	"main/types"
 	"main/utility"
@@ -39,7 +40,6 @@ func createGift(ctx *gin.Context) {
 	ctx.JSON(200, gin.H{
 		"error": nil,
 	})
-	return
 }
 
 func getRoomGifts(ctx *gin.Context) {
