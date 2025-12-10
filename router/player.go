@@ -2,6 +2,7 @@ package router
 
 import (
 	"log"
+
 	"main/db"
 
 	"github.com/gin-gonic/gin"
@@ -21,9 +22,9 @@ func getPlayer(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(200, gin.H{
-		"name":  player.Name,
-		"room":  player.RoomID,
-		"error": nil,
+		"name":   player.Name,
+		"roomId": player.RoomID,
+		"error":  nil,
 	})
 }
 
