@@ -29,11 +29,8 @@ func CreateRoomTable(c context.Context) error {
 
 func GetRoom(c context.Context, roomid string) (*NarrowRoom, error) {
 	var room NarrowRoom
-	row, err := dbpool.Query(c, "SELECT * FROM gifts WHERE rid = $1;", roomid)
-	if err != nil {
-		return nil, err
-	}
-	err = row.Scan(&room.RoomID, &room.Started)
+	row := dbpool.QueryRow(c, "SELECT * FROM room WHERE rid = $1;", roomid)
+	err := row.Scan(&room.RoomID, &room.Started)
 	if err != nil {
 		return nil, err
 	}
