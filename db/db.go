@@ -3,9 +3,10 @@ package db
 import (
 	"context"
 	"fmt"
+	"os"
+
 	"main/types"
 	"main/utility"
-	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
@@ -35,10 +36,12 @@ func InitPostgresDB() {
 	DeletePlayersTable(ctx)
 	DeleteGiftsTable(ctx)
 	DeleteTagsTable(ctx)
+	DeleteRoomTable(ctx)
 
 	CreatePlayersTable(ctx)
 	CreateGiftsTable(ctx)
 	CreateTagsTable(ctx)
+	CreateRoomTable(ctx)
 }
 
 type Room struct {
@@ -69,5 +72,5 @@ func GetAll(ctx context.Context) (ret []Room, err error) {
 		room.Presents = utility.CollectPresentsByGifter(tempPresents)
 		ret = append(ret, room)
 	}
-	return
+	return ret, err
 }

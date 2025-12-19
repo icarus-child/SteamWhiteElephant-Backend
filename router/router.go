@@ -15,5 +15,8 @@ func InitRouter() *gin.Engine {
 	r.GET("/room-presents", getRoomGifts)
 	r.POST("/present", createGift)
 
+	r.GET("/room-started", getRoomStarted)
+	r.POST("/start-room", startRoom)
+
 	return r
 }
