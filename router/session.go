@@ -62,19 +62,3 @@ func startRoom(ctx *gin.Context) {
 		"error": nil,
 	})
 }
-
-func getAll(ctx *gin.Context) {
-	all, err := db.GetAll(ctx)
-	if err != nil {
-		log.Println(err.Error())
-		ctx.JSON(400, gin.H{
-			"rooms": nil,
-			"error": err.Error(),
-		})
-		return
-	}
-	ctx.JSON(200, gin.H{
-		"rooms": all,
-		"error": nil,
-	})
-}

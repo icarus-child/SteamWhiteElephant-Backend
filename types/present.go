@@ -16,4 +16,5 @@ type ItemJson struct {
 type PresentJson struct {
 	GifterId string     `json:"gifterId"`
 	Items    []ItemJson `json:"items"`
+	Texture  []byte
 }

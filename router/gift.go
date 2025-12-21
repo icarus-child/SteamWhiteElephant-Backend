@@ -1,6 +1,7 @@
 package router
 
 import (
+	"io"
 	"log"
 
 	"main/db"
@@ -20,7 +21,6 @@ func createGift(ctx *gin.Context) {
 		})
 		return
 	}
-
 	for _, item := range present.Items {
 		var gift types.Gift = types.Gift{
 			GifterID: present.GifterId,
@@ -42,6 +42,19 @@ func createGift(ctx *gin.Context) {
 	})
 }
 
+func createTexture(ctx *gin.Context) {
+	playerID := ctx.GetHeader("X-Player-ID")
+	data, err := io.ReadAll(ctx.Request.Body)
+	if err != nil {
+		log.Println(err.Error())
+		ctx.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	err = db.CreateTexture(ctx, playerID, data)
+	log.Println("received bytes:", len(data))
+	ctx.JSON(200, gin.H{"ok": true})
+}
+
 func getRoomGifts(ctx *gin.Context) {
 	id := ctx.Query("id")
 
@@ -54,8 +67,27 @@ func getRoomGifts(ctx *gin.Context) {
 		})
 		return
 	}
+
+	presents := utility.CollectPresentsByGifter(ctx, gifts)
+	log.Println(len(presents[0].Texture))
 	ctx.JSON(200, gin.H{
-		"presents": utility.CollectPresentsByGifter(gifts),
+		"presents": presents,
 		"error":    nil,
 	})
+}
+
+func getTexture(ctx *gin.Context) {
+	id := ctx.Query("id")
+
+	texture, err := db.GetTexture(ctx, id)
+	if err != nil {
+		log.Println(err.Error())
+		ctx.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	ctx.Header("Content-Type", "image/png")
+	ctx.Header("Content-Disposition", "inline; filename=texture.png")
+	ctx.Writer.Write(texture)
 }
