@@ -3,7 +3,6 @@ package utility
 import (
 	"context"
 
-	"main/db"
 	"main/types"
 )
 
@@ -26,15 +25,9 @@ func CollectPresentsByGifter(ctx context.Context, gifts []types.Gift) (presents 
 	}
 
 	for gifterId, items := range itemsMap {
-		texture, err := db.GetTexture(ctx, gifterId)
-		if err != nil {
-			println(err.Error())
-			return presents
-		}
 		var present types.PresentJson = types.PresentJson{
 			GifterId: gifterId,
 			Items:    items,
-			Texture:  texture,
 		}
 		presents = append(presents, present)
 	}
