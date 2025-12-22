@@ -36,13 +36,13 @@ func InitPostgresDB() {
 	DeleteGiftsTable(ctx)
 	DeleteTagsTable(ctx)
 	DeleteRoomTable(ctx)
-	DeleteTextureTable(ctx)
+	DeleteWrappingPaper(ctx)
 
 	CreatePlayersTable(ctx)
 	CreateGiftsTable(ctx)
 	CreateTagsTable(ctx)
 	CreateRoomTable(ctx)
-	CreateTextureTable(ctx)
+	CreateWrappingPaper(ctx)
 }
 
 type Room struct {

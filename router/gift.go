@@ -21,6 +21,16 @@ func createGift(ctx *gin.Context) {
 		})
 		return
 	}
+
+	err = db.CreateGiftName(ctx, present.GifterId, present.GiftName)
+	if err != nil {
+		log.Println(err.Error())
+		ctx.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
 	for _, item := range present.Items {
 		var gift types.Gift = types.Gift{
 			GifterID: present.GifterId,
@@ -69,7 +79,6 @@ func getRoomGifts(ctx *gin.Context) {
 	}
 
 	presents := utility.CollectPresentsByGifter(ctx, gifts)
-	log.Println(len(presents[0].Texture))
 	ctx.JSON(200, gin.H{
 		"presents": presents,
 		"error":    nil,

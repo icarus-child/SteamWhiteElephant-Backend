@@ -2,7 +2,9 @@ package utility
 
 import (
 	"context"
+	"log"
 
+	"main/db"
 	"main/types"
 )
 
@@ -25,9 +27,14 @@ func CollectPresentsByGifter(ctx context.Context, gifts []types.Gift) (presents 
 	}
 
 	for gifterId, items := range itemsMap {
+		giftName, err := db.GetGiftName(ctx, gifterId)
+		if err != nil {
+			log.Println(err.Error())
+		}
 		var present types.PresentJson = types.PresentJson{
 			GifterId: gifterId,
 			Items:    items,
+			GiftName: giftName,
 		}
 		presents = append(presents, present)
 	}
