@@ -46,11 +46,69 @@ func getRoomStarted(ctx *gin.Context) {
 
 func startRoom(ctx *gin.Context) {
 	id := ctx.Query("id")
-	var room db.NarrowRoom
-	room.RoomID = id
-	room.Started = true
 
-	err := db.CreateRoom(ctx, room)
+	err := db.StartRoom(ctx, id)
+	if err != nil {
+		log.Println(err.Error())
+		ctx.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(200, gin.H{
+		"error": nil,
+	})
+}
+
+func getRoomTurnIndex(ctx *gin.Context) {
+	id := ctx.Query("id")
+	index, err := db.GetRoomTurnIndex(ctx, id)
+	if err != nil {
+		log.Println(err.Error())
+		ctx.JSON(400, gin.H{
+			"index": 0,
+			"error": err.Error(),
+		})
+		return
+	}
+	ctx.JSON(200, gin.H{
+		"index": index,
+		"error": nil,
+	})
+}
+
+type IndexRequest struct {
+	Index int16 `json:"index"`
+}
+
+func setRoomTurnIndex(ctx *gin.Context) {
+	var req IndexRequest
+	id := ctx.Query("id")
+	err := ctx.BindJSON(&req)
+	if err != nil {
+		log.Println(err.Error())
+		ctx.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	err = db.SetRoomTurnIndex(ctx, id, req.Index)
+	if err != nil {
+		log.Println(err.Error())
+		ctx.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	ctx.JSON(200, gin.H{
+		"error": nil,
+	})
+}
+
+func randomizePlayerOrder(ctx *gin.Context) {
+	id := ctx.Query("id")
+	err := db.RandomizePlayerOrder(ctx, id)
 	if err != nil {
 		log.Println(err.Error())
 		ctx.JSON(400, gin.H{

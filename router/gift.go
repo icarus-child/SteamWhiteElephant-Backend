@@ -61,8 +61,35 @@ func createTexture(ctx *gin.Context) {
 		return
 	}
 	err = db.CreateTexture(ctx, playerID, data)
-	log.Println("received bytes:", len(data))
 	ctx.JSON(200, gin.H{"ok": true})
+}
+
+func getPlayerHeldGift(ctx *gin.Context) {
+	id := ctx.Query("id")
+
+	gifts, err := db.GetPlayerHeldGifts(ctx, id)
+	if err != nil {
+		log.Println(err.Error())
+		ctx.JSON(400, gin.H{
+			"present": nil,
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	if len(gifts) == 0 {
+		ctx.JSON(200, gin.H{
+			"present": nil,
+			"error":   nil,
+		})
+		return
+	}
+
+	presents := utility.CollectPresentsByGifter(ctx, gifts)
+	ctx.JSON(200, gin.H{
+		"present": presents[0],
+		"error":   nil,
+	})
 }
 
 func getRoomGifts(ctx *gin.Context) {
@@ -99,4 +126,80 @@ func getTexture(ctx *gin.Context) {
 	ctx.Header("Content-Type", "image/png")
 	ctx.Header("Content-Disposition", "inline; filename=texture.png")
 	ctx.Writer.Write(texture)
+}
+
+func getPresentStolenThisRound(ctx *gin.Context) {
+	id := ctx.Query("id")
+
+	opened, err := db.GetPresentStolenThisRound(ctx, id)
+	if err != nil {
+		log.Println(err.Error())
+		ctx.JSON(400, gin.H{
+			"opened": false,
+			"error":  err.Error(),
+		})
+		return
+	}
+	ctx.JSON(200, gin.H{
+		"opened": opened,
+		"error":  nil,
+	})
+}
+
+func resetRound(ctx *gin.Context) {
+	id := ctx.Query("id")
+	err := db.ResetRound(ctx, id)
+	if err != nil {
+		log.Println(err.Error())
+		ctx.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	ctx.JSON(200, gin.H{
+		"error": nil,
+	})
+}
+
+func markPresentStolen(ctx *gin.Context) {
+	id := ctx.Query("id")
+	err := db.MarkPresentStolen(ctx, id)
+	if err != nil {
+		log.Println(err.Error())
+		ctx.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	ctx.JSON(200, gin.H{
+		"error": nil,
+	})
+}
+
+type TakeRequest struct {
+	PlayerID  string `json:"playerId"`
+	PresentID string `json:"presentId"`
+}
+
+func takeOrStealPresent(ctx *gin.Context) {
+	var req TakeRequest
+	err := ctx.BindJSON(&req)
+	if err != nil {
+		log.Println(err.Error())
+		ctx.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	err = db.TakeOrStealPresent(ctx, req.PlayerID, req.PresentID)
+	if err != nil {
+		log.Println(err.Error())
+		ctx.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	ctx.JSON(200, gin.H{
+		"error": nil,
+	})
 }

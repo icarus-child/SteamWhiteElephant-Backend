@@ -46,6 +46,24 @@ func getRoomPlayers(ctx *gin.Context) {
 	})
 }
 
+func getOrderedRoomPlayers(ctx *gin.Context) {
+	id := ctx.Query("id")
+
+	players, err := db.GetOrderedRoomPlayers(ctx, id)
+	if err != nil {
+		log.Println(err.Error())
+		ctx.JSON(400, gin.H{
+			"error":   err.Error(),
+			"players": nil,
+		})
+		return
+	}
+	ctx.JSON(200, gin.H{
+		"error":   nil,
+		"players": players,
+	})
+}
+
 func createPlayer(ctx *gin.Context) {
 	var json db.Player
 	err := ctx.BindJSON(&json)
@@ -71,5 +89,4 @@ func createPlayer(ctx *gin.Context) {
 	ctx.JSON(200, gin.H{
 		"error": nil,
 	})
-	return
 }
