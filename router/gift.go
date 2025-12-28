@@ -203,3 +203,35 @@ func takeOrStealPresent(ctx *gin.Context) {
 		"error": nil,
 	})
 }
+
+func increaseTimesStolen(ctx *gin.Context) {
+	id := ctx.Query("id")
+	err := db.IncreaseTimesStolen(ctx, id)
+	if err != nil {
+		log.Println(err.Error())
+		ctx.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	ctx.JSON(200, gin.H{
+		"error": nil,
+	})
+}
+
+func getTimesStolen(ctx *gin.Context) {
+	id := ctx.Query("id")
+	timesStolen, err := db.GetTimesStolen(ctx, id)
+	if err != nil {
+		log.Println(err.Error())
+		ctx.JSON(400, gin.H{
+			"timesStolen": nil,
+			"error":       err.Error(),
+		})
+		return
+	}
+	ctx.JSON(200, gin.H{
+		"timesStolen": timesStolen,
+		"error":       nil,
+	})
+}

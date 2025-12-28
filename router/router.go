@@ -17,10 +17,12 @@ func InitRouter() *gin.Engine {
 	r.GET("/texture", getTexture)
 	r.GET("/player-present", getPlayerHeldGift)
 	r.GET("/present-stolen-this-round", getPresentStolenThisRound)
+	r.GET("/times-stolen", getTimesStolen)
 	r.POST("/present", createGift)
 	r.POST("/texture", createTexture)
 	r.POST("/mark-present-stolen", markPresentStolen)
 	r.POST("/take-or-steal-present", takeOrStealPresent)
+	r.POST("/increase-times-stolen", increaseTimesStolen)
 
 	r.GET("/room-started", getRoomStarted)
 	r.GET("/room-turn-index", getRoomTurnIndex)

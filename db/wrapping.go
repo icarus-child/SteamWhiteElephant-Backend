@@ -14,7 +14,13 @@ func DeleteWrappingPaper(c context.Context) error {
 }
 
 func CreateWrappingPaper(c context.Context) error {
-	_, err := dbpool.Exec(c, "CREATE TABLE IF NOT EXISTS wrapping (pid UUID PRIMARY KEY REFERENCES players ON DELETE CASCADE, albedo BYTEA, giftName TEXT, stolenThisRound BOOLEAN DEFAULT FALSE);")
+	_, err := dbpool.Exec(c, `
+		CREATE TABLE IF NOT EXISTS wrapping 
+		(pid UUID PRIMARY KEY REFERENCES players ON DELETE CASCADE, 
+		albedo BYTEA, 
+		giftName TEXT, 
+		stolenThisRound BOOLEAN DEFAULT FALSE, 
+		timesStolen SMALLINT DEFAULT 0);`)
 	if err != nil {
 		println(err.Error())
 		return err
@@ -84,6 +90,25 @@ func MarkPresentStolen(c context.Context, pid string) error {
 
 func ResetRound(c context.Context, roomid string) error {
 	_, err := dbpool.Exec(c, "UPDATE wrapping SET stolenThisRound = FALSE WHERE pid IN (SELECT pid FROM players WHERE roomid = $1);", roomid)
+	if err != nil {
+		println(err.Error())
+		return err
+	}
+	return nil
+}
+
+func GetTimesStolen(c context.Context, pid string) (int16, error) {
+	var index int16
+	row := dbpool.QueryRow(c, "SELECT timesStolen FROM wrapping WHERE pid = $1;", pid)
+	err := row.Scan(&index)
+	if err != nil {
+		return 0, err
+	}
+	return index, nil
+}
+
+func IncreaseTimesStolen(c context.Context, pid string) error {
+	_, err := dbpool.Exec(c, "UPDATE wrapping SET timesStolen = timesStolen+1 WHERE pid = $1;", pid)
 	if err != nil {
 		println(err.Error())
 		return err
