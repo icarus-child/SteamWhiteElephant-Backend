@@ -3,12 +3,10 @@ package db
 import (
 	"context"
 	"fmt"
+	"main/types"
 	"os"
 
-	"main/types"
-
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/joho/godotenv"
 )
 
 var (
@@ -17,12 +15,6 @@ var (
 )
 
 func InitPostgresDB() {
-	err = godotenv.Load()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error loading .env file: %v\n", err)
-		os.Exit(1)
-	}
-
 	os.Setenv("DATABASE_URL", "postgres://postgres:"+os.Getenv("POSTGRES_PASSWORD")+"@localhost:5432")
 	dbpool, err = pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {
