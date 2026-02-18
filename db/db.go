@@ -3,8 +3,9 @@ package db
 import (
 	"context"
 	"fmt"
-	"main/types"
 	"os"
+
+	"main/types"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -15,7 +16,7 @@ var (
 )
 
 func InitPostgresDB() {
-	os.Setenv("DATABASE_URL", "postgres://postgres:"+os.Getenv("POSTGRES_PASSWORD")+"@localhost:5432")
+	os.Setenv("DATABASE_URL", "postgres://postgres:"+os.Getenv("POSTGRES_PASSWORD")+"@postgres:5432")
 	dbpool, err = pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to create connection pool: %v\n", err)
