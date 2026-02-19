@@ -3,9 +3,8 @@ package db
 import (
 	"context"
 	"fmt"
-	"os"
-
 	"main/types"
+	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -16,6 +15,7 @@ var (
 )
 
 func InitPostgresDB() {
+	println("postgres://postgres:" + os.Getenv("POSTGRES_PASSWORD") + "@postgres:5432")
 	os.Setenv("DATABASE_URL", "postgres://postgres:"+os.Getenv("POSTGRES_PASSWORD")+"@postgres:5432")
 	dbpool, err = pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {
