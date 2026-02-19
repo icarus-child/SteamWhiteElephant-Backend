@@ -7,6 +7,7 @@ RUN go build -o server
 
 FROM alpine
 WORKDIR /app
+ENV GIN_MODE=release
 COPY --from=builder /app/server .
 EXPOSE 3333
 CMD ["./server"]
